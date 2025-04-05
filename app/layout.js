@@ -1,3 +1,11 @@
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
@@ -8,16 +16,27 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Uber",
-  description: "Uber - A ride sharing app",
+  title: "Rider",
+  description: "Rider - Reliable Rides, Ready When You Are.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-poppins antialiased`}>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${poppins.variable} font-poppins antialiased`}>
+          <header className="flex justify-end items-center p-4 gap-4 h-16 border-b">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
