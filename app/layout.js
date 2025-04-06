@@ -1,15 +1,9 @@
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import { Poppins } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
 
-const poppins = Poppins({
+const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
@@ -24,16 +18,8 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${poppins.variable} font-poppins antialiased`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16 border-b">
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
+        <body className={`${montserrat.variable} font-montserrat antialiased`}>
+          <Header />
           {children}
         </body>
       </html>
