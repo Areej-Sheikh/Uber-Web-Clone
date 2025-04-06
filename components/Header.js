@@ -19,10 +19,10 @@ const Header = () => {
     <div>
       <div className="p-5 pb-3 pl-4 border-b-[4px] border-gray-200 bg-white flex items-center justify-between">
         <div className="flex items-center gap-24">
-          <Image src="/Logo.png" width={100} height={100} alt="logo" />
+          <Image src="/Logo.png" width={100} height={100} alt="logo" priority />
           <div className="flex items-center gap-6">
             {HeaderMenu.map((item) => (
-              <div className="flex items-center gap-2">
+              <div key={item.id} className="flex items-center gap-2">
                 <Image
                   src={item.icon}
                   width={30}
@@ -36,7 +36,7 @@ const Header = () => {
             ))}
           </div>
         </div>
-      <UserButton/>
+        <UserButton />
       </div>
     </div>
   );
