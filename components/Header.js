@@ -19,7 +19,14 @@ const Header = () => {
     <div>
       <div className="p-5 pb-3 pl-4 border-b-[4px] border-gray-200 bg-white flex items-center justify-between">
         <div className="flex items-center gap-24">
-          <Image src="/Logo.png" width={100} height={100} alt="logo" priority />
+          <Image
+            src="/Logo.png"
+            width={100}
+            height={100}
+            alt="logo"
+            priority
+            style={{ height: "auto" }}
+          />
           <div className="flex items-center gap-6">
             {HeaderMenu.map((item) => (
               <div key={item.id} className="flex items-center gap-2">
