@@ -1,13 +1,14 @@
-'use client';
+"use client";
 import GoogleMapSection from "@/components/Home/GoogleMapSection";
+import GoogleWrapper from "@/components/Home/GoogleWrapper";
 import SearchSection from "@/components/Home/SearchSection";
 import { DestinationContext } from "@/context/DestinationContext";
 import { SourceContext } from "@/context/SourceContext";
 import { useState } from "react";
 
 export default function Home() {
-  const [Source, setSource] = useState([])
-  const [Destination, setDestination] = useState([])
+  const [Source, setSource] = useState([]);
+  const [Destination, setDestination] = useState([]);
   return (
     <SourceContext.Provider value={{ Source, setSource }}>
       <DestinationContext.Provider value={{ Destination, setDestination }}>
@@ -16,7 +17,9 @@ export default function Home() {
             <SearchSection />
           </div>
           <div className="col-span-2">
-            <GoogleMapSection />
+            <GoogleWrapper>
+              <GoogleMapSection />
+            </GoogleWrapper>
           </div>
         </div>
       </DestinationContext.Provider>

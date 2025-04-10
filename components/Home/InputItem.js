@@ -18,36 +18,50 @@ const InputItem = ({ type }) => {
   const { setDestination } = useContext(DestinationContext);
 
   const getLatitudeLongitude = (place) => {
+    // ✅ Add safety check
+    if (!place || !place.value || !place.value.place_id) {
+      console.warn("Invalid place selected:", place);
+      return;
+    }
+
     const placeId = place.value.place_id;
     const service = new google.maps.places.PlacesService(
       document.createElement("div")
     );
 
-    service.getDetails({ placeId }, (placeDetails, status) => {
-      if (
-        status === "OK" &&
-        placeDetails.geometry &&
-        placeDetails.geometry.location
-      ) {
-        const lat = placeDetails.geometry.location.lat();
-        const lng = placeDetails.geometry.location.lng();
+    service.getDetails(
+      {
+        placeId,
+        fields: ["geometry.location", "formatted_address", "name"],
+      },
+      (placeDetails, status) => {
+        if (
+          status === "OK" &&
+          placeDetails.geometry &&
+          placeDetails.geometry.location
+        ) {
+          const lat = placeDetails.geometry.location.lat();
+          const lng = placeDetails.geometry.location.lng();
 
-        const payload = {
-          lat,
-          lng,
-          name: placeDetails.formatted_address,
-          label: placeDetails.name,
-        };
+          const payload = {
+            lat,
+            lng,
+            name: placeDetails.formatted_address,
+            label: placeDetails.name,
+          };
 
-        console.log(`${type} location:`, payload);
+          console.log(`${type} location:`, payload);
 
-        if (type === "source") {
-          setSource(payload);
+          if (type === "source") {
+            setSource(payload);
+          } else {
+            setDestination(payload);
+          }
         } else {
-          setDestination(payload);
+          console.error("Failed to fetch place details:", status);
         }
       }
-    });
+    );
   };
 
   return (
@@ -63,8 +77,8 @@ const InputItem = ({ type }) => {
         selectProps={{
           value,
           onChange: (place) => {
-            getLatitudeLongitude(place);
             setValue(place);
+            getLatitudeLongitude(place);
           },
           placeholder: isSource ? "Pickup Location" : "Dropoff Location",
           isClearable: true,
