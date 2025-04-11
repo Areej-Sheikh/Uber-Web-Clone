@@ -73,7 +73,6 @@ const InputItem = ({ type }) => {
         alt={isSource ? "Source Icon" : "Destination Icon"}
       />
       <GooglePlacesAutocomplete
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
         selectProps={{
           value,
           onChange: (place) => {
