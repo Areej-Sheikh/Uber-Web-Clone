@@ -1,8 +1,19 @@
 "use client";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { GoogleMap, DirectionsRenderer, MarkerF } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  DirectionsRenderer,
+  MarkerF,
+  OverlayView,
+} from "@react-google-maps/api";
 import { SourceContext } from "@/context/SourceContext";
 import { DestinationContext } from "@/context/DestinationContext";
+
+// Helper to position the label above the marker
+const getPixelPositionOffset = (width, height) => ({
+  x: -(width / 2),
+  y: -height - 40,
+});
 
 const GoogleMapSection = () => {
   const containerStyle = {
@@ -21,7 +32,6 @@ const GoogleMapSection = () => {
 
   useEffect(() => {
     if (map) {
-      // When both locations are set, fetch directions
       if (Source?.lat && Destination?.lat) {
         const directionsService = new window.google.maps.DirectionsService();
 
@@ -73,9 +83,6 @@ const GoogleMapSection = () => {
     setMap(null);
   }, []);
 
-  // Custom identical black pin icon URL (Google default pin in black)
-  const blackPinIcon = "https://maps.gstatic.com/mapfiles/ms2/micons/black.png";
-
   return (
     <div className="flex flex-col gap-4">
       <GoogleMap
@@ -86,47 +93,77 @@ const GoogleMapSection = () => {
         onUnmount={onUnmount}
         options={{ mapId: "8f2ec0e27e692b3c" }}
       >
-        {/* 🔲 Source Marker (Black Pin) */}
+        {/* 🔲 Source Marker & Label */}
         {Source?.lat && (
-          <MarkerF
-            position={{ lat: Source.lat, lng: Source.lng }}
-            icon={{
-              url: "/blackPinIcon.png",
-              scaledSize: new window.google.maps.Size(30, 30), // Adjust size as needed
-            }}
-          />
+          <>
+            <MarkerF
+              position={{ lat: Source.lat, lng: Source.lng }}
+              icon={{
+                url: "/blackPinIcon.png",
+                scaledSize: new window.google.maps.Size(30, 30),
+              }}
+              title={Source?.label || "Pickup"}
+            />
+
+            <OverlayView
+              position={{ lat: Source.lat, lng: Source.lng }}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+              getPixelPositionOffset={getPixelPositionOffset}
+            >
+              <div>
+                <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
+                  Pickup
+                </span>
+              </div>
+            </OverlayView>
+          </>
         )}
 
-        {/* 🔲 Destination Marker (Black Pin) */}
+        {/* 🔲 Destination Marker & Label */}
+        {/* 🔲 Destination Marker */}
         {Destination?.lat && (
-          <MarkerF
-            position={{ lat: Destination.lat, lng: Destination.lng }}
-            icon={{
-              url: "/blackPinIcon.png",
-              scaledSize: new window.google.maps.Size(30, 30),
-            }}
-          />
+          <>
+            <MarkerF
+              position={{ lat: Destination.lat, lng: Destination.lng }}
+              icon={{
+                url: "/blackPinIcon.png",
+                scaledSize: new window.google.maps.Size(30, 30),
+              }}
+              title={Destination?.label || "Dropoff"}
+            />
+            <OverlayView
+              position={{ lat: Destination.lat, lng: Destination.lng }}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+              getPixelPositionOffset={getPixelPositionOffset}
+            >
+              <div>
+                <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
+                  Dropoff
+                </span>
+              </div>
+            </OverlayView>
+          </>
         )}
 
-        {/* 🔲 Directions Renderer with thinner black route */}
+        {/* 🛣️ Route with thinner black line */}
         {directions && (
           <DirectionsRenderer
             directions={directions}
             options={{
               polylineOptions: {
-                strokeColor: "#000000", // Black
+                strokeColor: "#000000",
                 strokeOpacity: 0.9,
-                strokeWeight: 2, // Thinner route
+                strokeWeight: 2,
               },
-              suppressMarkers: true, // We'll use our own custom markers
+              suppressMarkers: true,
             }}
           />
         )}
       </GoogleMap>
 
-      {/* Distance and Duration display */}
+      {/* 📏 Distance & Duration */}
       {distance && duration && (
-        <div className="text-sm bg-white p-3 rounded shadow max-w-sm border">
+        <div className="text-sm m-white p-3 rounded shadow max-w-sm border">
           <p>
             <strong>Distance:</strong> {distance}
           </p>
