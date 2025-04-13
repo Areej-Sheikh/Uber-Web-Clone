@@ -32,7 +32,7 @@ const CarListOptions = ({ distance }) => {
           <h2>Make Payment For</h2>
           <button
             className="bg-black text-white py-2 px-4 rounded-lg"
-            onClick={() => router.push("/payment")}
+            onClick={() => router.push("/payment?amount="+(selectedCar.amount*distance+170).toFixed(2))}
           >
             Request {selectedCar.name}
           </button>
