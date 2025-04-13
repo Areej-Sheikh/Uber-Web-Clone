@@ -18,17 +18,23 @@ const getPixelPositionOffset = (width, height) => ({
 const GoogleMapSection = () => {
   const containerStyle = {
     width: "100%",
-    height: "400px",
+    height: "450px",
   };
 
-  const [center, setCenter] = useState({ lat: -3.745, lng: -38.523 });
+  const { Source } = useContext(SourceContext);
+  const { Destination } = useContext(DestinationContext);
+
+  const defaultCenter = Source?.lat
+    ? { lat: Source.lat, lng: Source.lng }
+    : Destination?.lat
+    ? { lat: Destination.lat, lng: Destination.lng }
+    : { lat: -3.745, lng: -38.523 };
+
+  const [center, setCenter] = useState(defaultCenter);
   const [map, setMap] = useState(null);
   const [directions, setDirections] = useState(null);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
-
-  const { Source } = useContext(SourceContext);
-  const { Destination } = useContext(DestinationContext);
 
   useEffect(() => {
     if (map) {
@@ -72,9 +78,11 @@ const GoogleMapSection = () => {
 
   const onLoad = useCallback(
     (mapInstance) => {
-      const bounds = new window.google.maps.LatLngBounds(center);
-      mapInstance.fitBounds(bounds);
-      setMap(mapInstance);
+      if (mapInstance && center) {
+        const bounds = new window.google.maps.LatLngBounds(center);
+        mapInstance.fitBounds(bounds);
+        setMap(mapInstance);
+      }
     },
     [center]
   );
@@ -93,77 +101,80 @@ const GoogleMapSection = () => {
         onUnmount={onUnmount}
         options={{ mapId: "8f2ec0e27e692b3c" }}
       >
-        {/* 🔲 Source Marker & Label */}
-        {Source?.lat && (
+        {map && (
           <>
-            <MarkerF
-              position={{ lat: Source.lat, lng: Source.lng }}
-              icon={{
-                url: "/blackPinIcon.png",
-                scaledSize: new window.google.maps.Size(30, 30),
-              }}
-              title={Source?.label || "Pickup"}
-            />
+            {/* 🔲 Source Marker & Label */}
+            {Source?.lat && (
+              <>
+                <MarkerF
+                  position={{ lat: Source.lat, lng: Source.lng }}
+                  icon={{
+                    url: "/blackPinIcon.png",
+                    scaledSize: new window.google.maps.Size(30, 30),
+                  }}
+                  title={Source?.label || "Pickup"}
+                />
 
-            <OverlayView
-              position={{ lat: Source.lat, lng: Source.lng }}
-              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-              getPixelPositionOffset={getPixelPositionOffset}
-            >
-              <div>
-                <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
-                  Pickup
-                </span>
-              </div>
-            </OverlayView>
+                <OverlayView
+                  position={{ lat: Source.lat, lng: Source.lng }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                  getPixelPositionOffset={getPixelPositionOffset}
+                >
+                  <div>
+                    <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
+                      Pickup
+                    </span>
+                  </div>
+                </OverlayView>
+              </>
+            )}
+
+            {/* 🔲 Destination Marker & Label */}
+            {Destination?.lat && (
+              <>
+                <MarkerF
+                  position={{ lat: Destination.lat, lng: Destination.lng }}
+                  icon={{
+                    url: "/blackPinIcon.png",
+                    scaledSize: new window.google.maps.Size(30, 30),
+                  }}
+                  title={Destination?.label || "Dropoff"}
+                />
+                <OverlayView
+                  position={{ lat: Destination.lat, lng: Destination.lng }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                  getPixelPositionOffset={getPixelPositionOffset}
+                >
+                  <div>
+                    <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
+                      Dropoff
+                    </span>
+                  </div>
+                </OverlayView>
+              </>
+            )}
+
+            {/* 🛣️ Route with thinner black line */}
+            {directions && (
+              <DirectionsRenderer
+                directions={directions}
+                options={{
+                  polylineOptions: {
+                    strokeColor: "#000000",
+                    strokeOpacity: 0.9,
+                    strokeWeight: 2,
+                  },
+                  suppressMarkers: true,
+                }}
+              />
+            )}
           </>
-        )}
-
-        {/* 🔲 Destination Marker & Label */}
-        {/* 🔲 Destination Marker */}
-        {Destination?.lat && (
-          <>
-            <MarkerF
-              position={{ lat: Destination.lat, lng: Destination.lng }}
-              icon={{
-                url: "/blackPinIcon.png",
-                scaledSize: new window.google.maps.Size(30, 30),
-              }}
-              title={Destination?.label || "Dropoff"}
-            />
-            <OverlayView
-              position={{ lat: Destination.lat, lng: Destination.lng }}
-              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-              getPixelPositionOffset={getPixelPositionOffset}
-            >
-              <div>
-                <span className="inline-block bg-black text-white text-sm font-bold px-2 py-1 rounded shadow">
-                  Dropoff
-                </span>
-              </div>
-            </OverlayView>
-          </>
-        )}
-
-        {/* 🛣️ Route with thinner black line */}
-        {directions && (
-          <DirectionsRenderer
-            directions={directions}
-            options={{
-              polylineOptions: {
-                strokeColor: "#000000",
-                strokeOpacity: 0.9,
-                strokeWeight: 2,
-              },
-              suppressMarkers: true,
-            }}
-          />
         )}
       </GoogleMap>
 
       {/* 📏 Distance & Duration */}
       {distance && duration && (
-        <div className="text-sm m-white p-3 rounded shadow max-w-sm border">
+        <div className="text-sm bg-white p-3 rounded shadow max-w-sm border">
           <p>
             <strong>Distance:</strong> {distance}
           </p>
